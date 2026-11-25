@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor Sensores IoT - Cygnus</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+    }
+    h2 { color: #38bdf8; text-align: center; margin-bottom: 6px; }
+    p.sub { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; text-align: center; }
+    .card {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      border: 1px solid #334155;
+    }
+    .titulo-var { font-size: 1rem; color: #94a3b8; }
+    .valor { font-size: 3rem; font-weight: bold; margin: 10px 0; }
+    .temp { color: #fb923c; }
+    .hum { color: #34d399; }
+    .estado { font-size: 0.85rem; color: #64748b; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>MONITOR DE SENSORES IoT</h2>
+  <p class="sub">Plataforma Cygnus UNIAJC &bull; Nodo DHT22</p>
+
+  <div class="card">
+    <div class="titulo-var">Temperatura Ambiente (ID 243)</div>
+    <div id="val-temp" class="valor temp">-- °C</div>
+  </div>
+
+  <div class="card">
+    <div class="titulo-var">Humedad Relativa (ID 244)</div>
+    <div id="val-hum" class="valor hum">-- %</div>
+  </div>
+
+  <div id="hora-act" class="estado">Actualizando cada 3 segundos...</div>
+
+  <script>
+    const URL_TEMP = "https://cygnus.uniajc.edu.co/appis/ldispositivo.php?id=243&c=temp123";
+    const URL_HUM  = "https://cygnus.uniajc.edu.co/appis/ldispositivo.php?id=244&c=hum123";
+
+    async function leerSensores() {
+      try {
+        const rTemp = await fetch(URL_TEMP);
+        if (rTemp.ok) {
+          const t = (await rTemp.text()).trim();
+          document.getElementById("val-temp").innerText = t + " °C";
+        }
+      } catch (e) { console.error(e); }
+
+      try {
+        const rHum = await fetch(URL_HUM);
+        if (rHum.ok) {
+          const h = (await rHum.text()).trim();
+          document.getElementById("val-hum").innerText = h + " %";
+        }
+      } catch (e) { console.error(e); }
+
+      const ahora = new Date().toLocaleTimeString();
+      document.getElementById("hora-act").innerText = "Última lectura: " + ahora;
+    }
+
+    setInterval(leerSensores, 3000);
+    leerSensores();
+  </script>
+
+</body>
+</html>
